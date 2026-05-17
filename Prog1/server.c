@@ -1,24 +1,18 @@
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<sys/stat.h>
-#include<unistd.h>
-#include<netinet/in.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<fcntl.h>
-#include<arpa/inet.h>
 
-// socket
-// bind
-// listen
-// accept
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <arpa/inet.h>
 
-int main(){
-	int cont, create_socket, new_socket, fd;
+int main() {
+	int create_socket, new_socket;
 	socklen_t addrlen;
 	int buffsize = 1024;
-	char *buffer = malloc(buffsize);
-	char fname[256];
+	char buffer[1024];
 	struct sockaddr_in address;
 
 	if ((create_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -52,34 +46,36 @@ int main(){
 
 	printf("Client connected: %s\n", inet_ntoa(address.sin_addr));
 
-	if (recv(new_socket, fname, sizeof(fname) - 1, 0) <= 0) {
-		perror("recv filename");
-		close(new_socket);
-		close(create_socket);
-		return 1;
-	}
+	while (1) {
+		// Receive message from client
+		ssize_t recv_len = recv(new_socket, buffer, buffsize - 1, 0);
+		if (recv_len <= 0) {
+			printf("Client disconnected or error.\n");
+			break;
+		}
+		buffer[recv_len] = '\0';
+		printf("Client: %s\n", buffer);
+		if (strcmp(buffer, "exit") == 0) {
+			printf("Conversation ended by client.\n");
+			break;
+		}
 
-	fname[sizeof(fname) - 1] = '\0';
-
-	if ((fd = open(fname, O_RDONLY)) < 0) {
-		perror("open");
-		close(new_socket);
-		close(create_socket);
-		return 1;
-	}
-
-	while ((cont = read(fd, buffer, buffsize)) > 0) {
-		ssize_t w = write(1, buffer, cont);
-		(void)w;
-		if (send(new_socket, buffer, cont, 0) < 0) {
+		// Send message to client
+		printf("Server: ");
+		fflush(stdout);
+		if (!fgets(buffer, buffsize, stdin)) break;
+		buffer[strcspn(buffer, "\n")] = 0;
+		if (send(new_socket, buffer, strlen(buffer), 0) < 0) {
 			perror("send");
+			break;
+		}
+		if (strcmp(buffer, "exit") == 0) {
+			printf("Conversation ended by server.\n");
 			break;
 		}
 	}
 
-	close(fd);
 	close(new_socket);
-	free(buffer);
-
-	return close(create_socket);
+	close(create_socket);
+	return 0;
 }

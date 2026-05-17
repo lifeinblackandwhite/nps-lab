@@ -1,24 +1,21 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<fcntl.h>
-#include<arpa/inet.h>
-#include<netinet/in.h>
-#include<sys/types.h>
-#include<sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	if (argc != 2) {
 		fprintf(stderr, "Usage: %s <server-ip>\n", argv[0]);
 		return 1;
 	}
 
-	int create_socket, cont;
+	int create_socket;
 	int buffsize = 1024;
-	char *buffer = malloc(buffsize);
-	char fname[256];
+	char buffer[1024];
 	struct sockaddr_in address;
 
 	if ((create_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -39,21 +36,35 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	printf("Enter the file name:\n");
-	if (scanf("%255s", fname) != 1) {
-		fprintf(stderr, "No filename provided\n");
-		close(create_socket);
-		return 1;
+	while (1) {
+		// Send message to server
+		printf("Client: ");
+		fflush(stdout);
+		if (!fgets(buffer, buffsize, stdin)) break;
+		buffer[strcspn(buffer, "\n")] = 0;
+		if (send(create_socket, buffer, strlen(buffer), 0) < 0) {
+			perror("send");
+			break;
+		}
+		if (strcmp(buffer, "exit") == 0) {
+			printf("Conversation ended by client.\n");
+			break;
+		}
+
+		// Receive message from server
+		ssize_t recv_len = recv(create_socket, buffer, buffsize - 1, 0);
+		if (recv_len <= 0) {
+			printf("Server disconnected or error.\n");
+			break;
+		}
+		buffer[recv_len] = '\0';
+		printf("Server: %s\n", buffer);
+		if (strcmp(buffer, "exit") == 0) {
+			printf("Conversation ended by server.\n");
+			break;
+		}
 	}
 
-	if (send(create_socket, fname, strlen(fname), 0) < 0)
-		perror("send");
-
-	while ((cont = recv(create_socket, buffer, buffsize, 0)) > 0) {
-		ssize_t w = write(1, buffer, cont);
-		(void)w;
-	}
-
-	free(buffer);
-	return close(create_socket);
+	close(create_socket);
+	return 0;
 }
