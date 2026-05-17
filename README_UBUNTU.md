@@ -65,11 +65,27 @@ gcc Prog3/checksum.c -o Prog3/checksum
 gcc Prog3/hamming.c -o Prog3/hamming
 ```
 
-Run checksum (enter 10 hex 16-bit words when prompted):
+Run checksum:
 
 ```bash
 ./Prog3/checksum
 ```
+
+Sample input format:
+
+- **Sender:** When prompted, enter 10 hex 16-bit words (space-separated or one per line):
+
+  Example:
+  1234 abcd 5678 9abc 0001 1111 2222 3333 4444 5555
+
+  The program will display the computed checksum (e.g., 50c8).
+
+- **Receiver:** When prompted, enter the same 10 hex words plus the checksum as the 11th value:
+
+  Example:
+  1234 abcd 5678 9abc 0001 1111 2222 3333 4444 5555 50c8
+
+  If the data is correct, the program will report "No error in Data received".
 
 Run hamming (enter four data bits when prompted):
 
@@ -238,8 +254,8 @@ Run RSA demo (single word, no spaces):
 
 If you want, I can also: compile all programs now and report any compile errors, or create a single helper script that builds every program automatically. Reply which you'd prefer.
 
-Fixes applied
--------------
+## Fixes applied
+
 I made a set of safety and correctness fixes to the C sources to make them safer to build and run on Ubuntu. Key changes:
 
 - Added `argc` / address validation to clients that assumed `argv[1]` existed.
