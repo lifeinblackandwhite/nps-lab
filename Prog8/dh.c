@@ -1,29 +1,51 @@
 #include <stdio.h>
-#include<stdlib.h>
-#include<time.h>
-#include<math.h>
+
+long long mod_exp(long long base, long long exp, long long mod)
+{
+    long long result = 1;
+
+    while(exp > 0)
+    {
+        if(exp % 2 == 1)
+            result = (result * base) % mod;
+
+        base = (base * base) % mod;
+        exp = exp / 2;
+    }
+
+    return result;
+}
 
 int main()
 {
-	long long int p,g;
-	long long int a, b;	// a - Alice's private Key, b - Bob's private Key.
-	long long int A, B;	// A - Alice's Public Key, B - Bob's Public Key
-	printf("Enter the prime no(p) :");
-	scanf("%lld",&p);
-	printf("\nEnter the primitive root of p(g) :");
-	scanf("%lld",&g);
-	printf("\nEnter the alice private key (a) :");
-	scanf("%lld",&a);
-	printf("\nEnter the Bob private key (b) :");
-	scanf("%lld",&b);
-	
-	A = (long long int) pow(g,a)%p;
-	B = (long long int) pow(g,b)%p;
+    long long p, g;
+    long long a, b;
+    long long A, B;
+    long long keyA, keyB;
 
-	long long int keyA = (long long int) pow(B,a)%p;
-	long long int keyB = (long long int) pow(A,b)%p;
+    printf("Enter the prime no(p): ");
+    scanf("%lld", &p);
 
-	printf("\nAlice's Secret Key is %lld\nBob's Secret Key is %lld\n\n", keyA, keyB);
+    printf("Enter the primitive root of p(g): ");
+    scanf("%lld", &g);
 
-	return 0;
+    printf("Enter Alice private key (a): ");
+    scanf("%lld", &a);
+
+    printf("Enter Bob private key (b): ");
+    scanf("%lld", &b);
+
+    A = mod_exp(g, a, p);
+    B = mod_exp(g, b, p);
+
+    keyA = mod_exp(B, a, p);
+    keyB = mod_exp(A, b, p);
+
+    printf("\nAlice Public Key = %lld", A);
+    printf("\nBob Public Key = %lld", B);
+
+    printf("\n\nAlice Secret Key = %lld", keyA);
+    printf("\nBob Secret Key = %lld\n", keyB);
+
+    return 0;
 }
