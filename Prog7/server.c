@@ -7,7 +7,7 @@
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<sys/socket.h>
-
+#include<string.h>
 
 void remote_command(int connfd, int port){
 	int n=1, buffsize=1024;

@@ -1,6 +1,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
-
+#include<string.h>
 #include <netinet/in.h>
 #include <sys/stat.h>
 #include <unistd.h>

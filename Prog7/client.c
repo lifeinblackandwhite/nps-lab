@@ -7,6 +7,7 @@
 #include<sys/types.h>
 #include<sys/stat.h>
 #include <sys/socket.h>
+#include<string.h>
 
 void str_cli(FILE *fp, int sockfd){
 	int cont, buffsize = 1024;
