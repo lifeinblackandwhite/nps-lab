@@ -14,16 +14,18 @@ void str_echo(int connfd,int port)
     char *buff = malloc(bufsize); 
     struct sockaddr_in addr;
 
-    do{
-        while((n=recv(connfd,buff,bufsize,0))>0)
-        { 
-            printf("From client connected to %d :",port); 
-            fputs(buff,stdout); 
-            printf("Reply to the client connected to %d :",port); 
-            fgets(buff,bufsize,stdin); 
-            send(connfd,buff,n,0); 
-        } 
-    }while(n>0);
+    do {
+        while ((n = recv(connfd, buff, bufsize, 0)) > 0) {
+            printf("From client connected to %d :", port);
+            ssize_t w = write(1, buff, n);
+            (void)w;
+            printf("Reply to the client connected to %d :", port);
+            if (fgets(buff, bufsize, stdin) != NULL) {
+                size_t len = strlen(buff);
+                send(connfd, buff, len, 0);
+            }
+        }
+    } while (n > 0);
 
 
 }

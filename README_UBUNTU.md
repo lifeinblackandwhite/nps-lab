@@ -237,3 +237,18 @@ Run RSA demo (single word, no spaces):
 - For network tests across machines, replace `127.0.0.1` with the server machine IP and ensure both machines can reach each other.
 
 If you want, I can also: compile all programs now and report any compile errors, or create a single helper script that builds every program automatically. Reply which you'd prefer.
+
+Fixes applied
+-------------
+I made a set of safety and correctness fixes to the C sources to make them safer to build and run on Ubuntu. Key changes:
+
+- Added `argc` / address validation to clients that assumed `argv[1]` existed.
+- Fixed incorrect `send`/`sendto` lengths where `sizeof(pointer)` or full buffer size was used; now use `strlen()` or the actual returned byte counts.
+- Avoided unsafe `printf("%s", buffer)` on non-NUL-terminated or binary data; use `write()` or NUL-terminate after `recv()`/`read()`.
+- Added basic error checking for `socket()`, `connect()`, `bind()`, `listen()`, and `accept()` in several places.
+- Replaced an incorrect RSA encrypt/decrypt loop with a correct modular-exponentiation implementation.
+- Disabled automatic execution of commands received by the remote-command server (`Prog7`) unless compiled with `-DENABLE_REMOTE_COMMAND_EXEC` (see `Prog7/server.c`). This prevents accidental remote code execution by default.
+
+Files changed (high level): `Prog1/*`, `Prog4/*`, `Prog5/*`, `Prog6C/*`, `Prog7/*`, `Prog8/rsa.c`.
+
+If you'd like, I can now attempt to compile all programs on this machine and report warnings/errors, or produce a `build_all.sh` script that compiles everything on Ubuntu. Which would you like me to do next?

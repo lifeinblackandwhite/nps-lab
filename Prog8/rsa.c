@@ -28,20 +28,34 @@ long int isprime(long int a)
 
 long int encrypt(char ch, long int n, long int e)
 {
-    int i;
-    long int temp = ch;
-    for(i = 1; i< e; i++)
-        temp = (temp * ch) % n;
-    return temp;
+    long long base = (unsigned char)ch;
+    long long result = 1;
+    long long mod = n;
+    long long exp = e;
+
+    while (exp > 0) {
+        if (exp & 1)
+            result = (result * base) % mod;
+        base = (base * base) % mod;
+        exp >>= 1;
+    }
+    return (long int)result;
 }
 
 char decrypt(long int ch, long int n, long int d)
 {
-    int i;
-    long int temp = ch;
-    for(i = 1; i< d; i++)
-    ch =(temp * ch) % n;
-    return ch;
+    long long base = ch;
+    long long result = 1;
+    long long mod = n;
+    long long exp = d;
+
+    while (exp > 0) {
+        if (exp & 1)
+            result = (result * base) % mod;
+        base = (base * base) % mod;
+        exp >>= 1;
+    }
+    return (char)result;
 }
 
 int main()

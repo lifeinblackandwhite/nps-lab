@@ -13,10 +13,11 @@
  
 int main()
 {
-struct sockaddr_in addr;
-int fd, nbytes,addrlen;
-struct ip_mreq mreq;
-char msgbuf[MSGBUFSIZE];
+	struct sockaddr_in addr;
+	int fd, nbytes;
+	socklen_t addrlen;
+	struct ip_mreq mreq;
+	char msgbuf[MSGBUFSIZE];
  
 u_int yes=1;        	
 if ((fd=socket(AF_INET,SOCK_DGRAM,0)) < 0) {
@@ -50,12 +51,16 @@ if (setsockopt(fd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&mreq,sizeof(mreq)) < 0) {
  	}
  
  	/* now just enter a read-print loop */
-while (1) {
-  	addrlen=sizeof(addr);
-  	if ((nbytes=recvfrom(fd,msgbuf,MSGBUFSIZE,0, (struct sockaddr *) &addr,&addrlen)) < 0) {
-  		perror("recvfrom");
-  	  }
-	
-  	puts(msgbuf);
- 	}
+	while (1) {
+		addrlen = sizeof(addr);
+		if ((nbytes = recvfrom(fd, msgbuf, MSGBUFSIZE - 1, 0, (struct sockaddr *)&addr, &addrlen)) < 0) {
+			perror("recvfrom");
+			continue;
+		}
+
+		if (nbytes > 0) {
+			msgbuf[nbytes] = '\0';
+			puts(msgbuf);
+		}
+	}
 }

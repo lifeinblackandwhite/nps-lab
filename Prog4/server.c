@@ -16,7 +16,7 @@ int main()
 struct sockaddr_in addr;
 int fd, cnt;
 //struct ip_mreq mreq;
-char *message="RVCE-CSE";
+char *message = "RVCE-CSE";
  
  	/* create what looks like an ordinary UDP socket */
 if ((fd=socket(AF_INET,SOCK_DGRAM,0)) < 0) {
@@ -32,7 +32,7 @@ addr.sin_port=htons(HELLO_PORT);
  
  	/* now just sendto() our destination! */
 while (1) {
-  	if (sendto(fd,message,sizeof(message),0,(struct sockaddr *) &addr,sizeof(addr)) < 0) {
+		if (sendto(fd, message, strlen(message), 0, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
   		perror("sendto");
   		exit(1);
   	  }

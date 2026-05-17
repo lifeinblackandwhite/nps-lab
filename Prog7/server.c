@@ -13,13 +13,26 @@ void remote_command(int connfd, int port){
 	int n=1, buffsize=1024;
 	char *buffer = malloc(buffsize);
 
+	if (!buffer) return;
+
 	do{
-		while((n=recv(connfd, buffer, buffsize, 0)) > 0){
-			send(connfd, buffer, n, 0);
+		while((n = recv(connfd, buffer, buffsize - 1, 0)) > 0){
+			buffer[n] = '\0';
+			if (send(connfd, buffer, n, 0) < 0)
+				perror("send");
+
 			printf("Port Number: %d\n", port);
+#ifdef ENABLE_REMOTE_COMMAND_EXEC
+			/* Only execute when explicitly enabled at build time */
 			system(buffer);
+#else
+			/* Execution disabled: log the command instead */
+			fprintf(stderr, "[remote_command] execution disabled. Command received: %s\n", buffer);
+#endif
 		}
-	}while(n>0);
+	} while(n > 0);
+
+	free(buffer);
 }
 
 
