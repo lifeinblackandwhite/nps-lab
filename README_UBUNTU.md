@@ -158,25 +158,25 @@ Run client (terminal B):
 # follow prompts (enter filename or input as requested)
 ```
 
-Prog6B - UDP echo (client/server)
+Prog6B - TCP echo (client/server)
 
 Compile:
 
 ```bash
-gcc Prog6B/server.c -o Prog6B/udp_server
-gcc Prog6B/client.c -o Prog6B/udp_client
+gcc Prog6B/server.c -o Prog6B/server
+gcc Prog6B/client.c -o Prog6B/client
 ```
 
 Run server (terminal A):
 
 ```bash
-./Prog6B/udp_server
+./Prog6B/server
 ```
 
 Run client (terminal B):
 
 ```bash
-./Prog6B/udp_client 127.0.0.1
+./Prog6B/client 127.0.0.1
 # then type lines to send; server will echo them back
 ```
 
@@ -223,6 +223,26 @@ Run client (terminal B):
 # type shell commands; server executes them using system()
 ```
 
+Notes and safety:
+
+- By default the server does NOT execute received commands. The server logs received commands and echoes them back unless compiled with the execution flag.
+- To enable remote command execution (DANGEROUS), compile the server with the `ENABLE_REMOTE_COMMAND_EXEC` macro enabled:
+
+```bash
+gcc Prog7/server.c -o Prog7/server
+gcc Prog7/client.c -o Prog7/client
+
+type cmd in client side like hi and server will recieve it
+```
+
+- Only enable execution in a trusted, isolated environment. Remote command execution can run arbitrary shell commands on the server machine and is a security risk.
+
+- When execution is disabled the server prints a message like:
+
+  [remote_command] execution disabled. Command received: <command>
+
+  and still echoes the received command back to the client for testing.
+
 Prog8 - Crypto demos (Diffie-Hellman and RSA)
 
 Compile:
@@ -245,6 +265,78 @@ Run RSA demo (single word, no spaces):
 ./Prog8/rsa
 # enter the text when prompted
 ```
+
+## Sample Inputs
+
+Quick example inputs you can type when running each program interactively.
+
+- **Prog1 (TCP file transfer)**: when the client prompts for a filename, enter a file present in the server directory, e.g.
+
+  sample.txt
+
+- **Prog2 (Distance Vector)**: first enter node count, then the matrix (use `999` for infinity). Example for 4 nodes:
+
+  4
+  0 3 999 7
+  8 0 2 999
+  5 999 0 1
+  2 999 999 0
+
+- **Prog3 (Checksum)**:
+  - Sender (10 hex 16-bit words):
+
+    1234 abcd 5678 9abc 0001 1111 2222 3333 4444 5555
+
+  - Receiver (same 10 words + checksum as 11th):
+
+    1234 abcd 5678 9abc 0001 1111 2222 3333 4444 5555 50c8
+
+- **Prog3 (Hamming)**: enter four data bits when prompted, e.g.
+
+  1 0 1 1
+
+  Program shows encoded 7 bits; when asked for received bits enter 7 bits (same or with one flipped), e.g.
+
+  0 1 1 0 0 1 1
+
+- **Prog4 (Multicast)**: a short message to send, e.g.
+
+  Hello multicast
+
+- **Prog5 (TCP echo)**: type a line to be echoed, e.g.
+
+  Hello server
+
+- **Prog6A (TCP file/echo)**: enter a filename as in Prog1, e.g.
+
+  sample.txt
+
+- **Prog6B (TCP echo)**: type a line to be echoed back, e.g.
+
+  Ping from client
+
+- **Prog6C (TCP single-client echo)**: send a message like:
+
+  Test message
+
+- **Prog7 (Remote command server)**: type shell commands at the client. Example:
+
+  date
+  uname -a
+
+  (By default execution is disabled; compile with `-DENABLE_REMOTE_COMMAND_EXEC` to enable — see notes above.)
+
+- **Prog8 (Crypto demos)**:
+  - Diffie-Hellman (`Prog8/dh`): example values:
+
+    p=23
+    g=5
+    a=6
+    b=15
+
+  - RSA (`Prog8/rsa`): enter a single word (no spaces), e.g.
+
+    HELLO
 
 ## Troubleshooting
 
